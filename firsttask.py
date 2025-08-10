@@ -1,7 +1,12 @@
 while True:
     try:
         num = int(input("Enter the number of rows: "))
-        if num > 0:
+        print(num)
+        if num > 0: 
+            if type(num) == int:
+                print("num is an str.")
+            else:
+                print("num is another type.")
             break
     except:
         continue
