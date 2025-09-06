@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .setup-screen, .game-screen {
+            margin: 30px 0;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 120px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            margin: 0 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .question {
+            font-size: 1.5em;
+            color: #333;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .buttons {
+            margin: 30px 0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .yes-btn:hover {
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .no-btn {
+            background: linear-gradient(135deg, #f44336 0%, #da190b 100%);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .no-btn:hover {
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.6);
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .stats h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .range-display {
+            font-size: 1.2em;
+            color: #555;
+            margin: 15px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            border: 2px solid #2196f3;
+        }
+
+        .result {
+            font-size: 1.8em;
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 15px;
+            animation: bounce 0.5s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+
+        .question-count {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="question-count hidden" id="questionCount">Questions: 0</div>
+        
+        <h1>🎯 Number Guessing Game</h1>
+        
+        <div id="setupScreen" class="setup-screen">
+            <div class="instructions">
+                <h3>📝 How to Play:</h3>
+                <p>1. Set the number range (e.g., 1 to 100)</p>
+                <p>2. Think of a number within that range</p>
+                <p>3. Answer YES or NO to my questions</p>
+                <p>4. I'll find your number using the fewest questions possible!</p>
+            </div>
+            
+            <div class="input-group">
+                <label>Set the number range:</label>
+                <div>
+                    <input type="number" id="minRange" value="1" placeholder="Min">
+                    <span>to</span>
+                    <input type="number" id="maxRange" value="100" placeholder="Max">
+                </div>
+            </div>
+            
+            <button onclick="startGame()">🚀 Start Game</button>
+        </div>
+
+        <div id="gameScreen" class="game-screen hidden">
+            <div class="range-display" id="currentRange"></div>
+            
+            <div class="question" id="questionText"></div>
+            
+            <div class="buttons">
+                <button class="yes-btn" onclick="answerYes()">✅ YES</button>
+                <button class="no-btn" onclick="answerNo()">❌ NO</button>
+            </div>
+
+            <div class="stats">
+                <h3>📊 Game Stats</h3>
+                <div id="questionsAsked">Questions asked: 0</div>
+                <div id="remainingNumbers">Possible numbers: 0</div>
+            </div>
+        </div>
+
+        <div id="resultScreen" class="hidden">
+            <div class="result success" id="resultText"></div>
+            <button onclick="resetGame()">🔄 Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let minNum, maxNum, currentMin, currentMax, questionCount;
+
+        function startGame() {
+            minNum = parseInt(document.getElementById('minRange').value);
+            maxNum = parseInt(document.getElementById('maxRange').value);
+            
+            if (minNum >= maxNum) {
+                alert('Please make sure the maximum is greater than the minimum!');
+                return;
+            }
+            
+            currentMin = minNum;
+            currentMax = maxNum;
+            questionCount = 0;
+            
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            document.getElementById('questionCount').classList.remove('hidden');
+            
+            updateStats();
+            askQuestion();
+        }
+
+        function askQuestion() {
+            if (currentMin === currentMax) {
+                // Found the number!
+                showResult();
+                return;
+            }
+            
+            // Calculate the middle point for binary search
+            const mid = Math.floor((currentMin + currentMax) / 2);
+            
+            // Update question count
+            questionCount++;
+            document.getElementById('questionCount').textContent = Questions: ${questionCount};
+            
+            // Ask the question
+            document.getElementById('questionText').textContent = 
+                Is your number greater than ${mid}?;
+            
+            updateStats();
+        }
+
+        function answerYes() {
+            // Number is greater than mid, so new minimum is mid + 1
+            const mid = Math.floor((currentMin + currentMax) / 2);
+            currentMin = mid + 1;
+            askQuestion();
+        }
+
+        function answerNo() {
+            // Number is less than or equal to mid, so new maximum is mid
+            const mid = Math.floor((currentMin + currentMax) / 2);
+            currentMax = mid;
+            askQuestion();
+        }
+
+        function updateStats() {
+            const remaining = currentMax - currentMin + 1;
+            document.getElementById('currentRange').textContent = 
+                Current range: ${currentMin} - ${currentMax};
+            document.getElementById('questionsAsked').textContent = 
+                Questions asked: ${questionCount};
+            document.getElementById('remainingNumbers').textContent = 
+                Possible numbers: ${remaining};
+        }
+
+        function showResult() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('questionCount').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+            
+            const maxPossibleQuestions = Math.ceil(Math.log2(maxNum - minNum + 1));
+            
+            document.getElementById('resultText').innerHTML = 
+                `🎉 Found it! Your number is <strong>${currentMin}</strong><br>
+                 It took me ${questionCount} questions.<br>
+                 (Maximum possible: ${maxPossibleQuestions} questions)`;
+        }
+
+        function resetGame() {
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('setupScreen').classList.remove('hidden');
+            
+            // Reset values
+            document.getElementById('minRange').value = 1;
+            document.getElementById('maxRange').value = 100;
+        }
+
+        // Allow Enter key to start game
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !document.getElementById('setupScreen').classList.contains('hidden')) {
+                startGame();
+            }
+        });
+    </script>
+</body>
+</html>
